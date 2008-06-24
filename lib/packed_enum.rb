@@ -38,7 +38,11 @@ class PackedEnum
   def each
     @attributes.each { |a| yield [a, self[a]] }
   end
-  
+
+  def to_hash
+    Hash[*@attributes.collect { |a| [a, self[a]] }.flatten]
+  end
+
   protected
   attr_reader :map
 
