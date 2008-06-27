@@ -1,13 +1,57 @@
 HasEnum
 ==================
 
-Introduction goes here.
+HasEnum allows you to store a set of related attributes in a single integer field and
+manipulate them as a hash.  It is intended to fix the common pattern of 
 
+has_many :boolean_settings
+
+but is not limited to boolean values.
 
 Example
 =======
 
-Example goes here.
+The plugin was developed for user privacy settings.  A user may have multiple privacy
+settings like email, last_name, birthday, interests, etc.  The value for each of these 
+settings is either public, private, or friends.  A normal flag-byte wouldn't support the
+tristate values, but HasEnum is flexible enough to handle any number of values (but keep 
+in mind the maximum width of your integer field).
 
+The syntax for the above example is:
+
+has_enum :privacy_settings,
+         :identifiers => [:public, :friends, :private]
+         :attributes => [[:email, :private],
+                         [:last_name, :friends],
+                         [:birthday, :friends],
+                         [:interests, :public]]
+
+:identifiers is the list of possible values for an attribute. :attributes is an array of 
+tuples where the first element is the name of the attribute and the second is the default 
+value.
+
+The default column name would be 'privacy_settings_map', but that can be changed with :column.
+
+Now you can use privacy_settings like a hash:
+
+user.privacy_settings[:email] 
+# => :private
+user.privacy_settings[:email] = :friends (but see limitations below)
+# => :friends
+user.privacy_settings[:email]
+# => :friends
+
+Limitations
+===========
+As you would expect from a flag byte, specification order is important.  Attribute
+order and number/order of identifiers must remain the same.  Changing any of these 
+will result in incorrect values from pre-existing maps.
+
+Adding attributes is possible but they should only be added to the end of the list.
+Future versions will include a method for converting from one representation to 
+another.
+
+Currently, it is not possible to set an attribute directly because composed_of requires
+frozen objects.  This will hopefully be coming soon.
 
 Copyright (c) 2008 Grant Rodgers, released under the MIT license
