@@ -12,7 +12,7 @@ class PackedEnum
   end
 
   def [](attribute)
-    raise ArgumentError, "attribute #{attribute} not defined" unless index = @attributes.index(attribute)
+    return nil unless index = @attributes.index(attribute)
     @reverse_identifiers[@map.get(index)]
   end
 
